@@ -1,17 +1,71 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React from "react";
+import ReactDom from "react-dom";
+import "./styles.css";
+import { contacts } from "./contact";
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+function App() {
+  return (
+    <>
+      <SearchBar />
+      <ContactsContainer contacts={contacts} />
+    </>
+  );
+}
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+function ContactsContainer(props) {
+  // Here we need to generate the different groups
+  const groups = [<ContactGroup contacts={props.contacts} key={"first"} />];
+  return <div className="contacts-container">{groups}</div>;
+}
+
+function ContactGroup(props) {
+  const contacts = props.contacts.map(contact => {
+    return <Contact {...contact} key={contact.name + contact.lastName} />;
+  });
+  return (
+    <div className="contact-group">
+      <p className="contact-index">{props.index}</p>
+      {contacts}
+    </div>
+  );
+}
+
+function Contact(props) {
+  const { name, lastName } = props;
+  return (
+    <div className="contact">
+      <div className="contact-profile">
+        {name.charAt(0) + lastName.charAt(0)}
+      </div>
+      <div className="contact-name">{props.name}</div>
+      <ThreeDotButton />
+    </div>
+  );
+}
+
+function ThreeDotButton() {
+  return (
+    <div className="three-dot-button" tabIndex="0">
+      <div className="dot"></div>
+      <div className="dot"></div>
+      <div className="dot"></div>
+    </div>
+  );
+}
+
+function SearchBar() {
+  return (
+    <div className="search-container">
+      <input
+        className="search-input"
+        placeholder="Search contact name"
+        type="text"
+      />
+      <button className="search-button" type="submit">
+        Search
+      </button>
+    </div>
+  );
+}
+
+ReactDom.render(<App />, document.getElementById("root"));
