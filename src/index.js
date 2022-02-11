@@ -1,7 +1,13 @@
 import React from "react";
 import ReactDom from "react-dom";
+
 import "./styles.css";
+import "./menus.css";
+import "./form.css";
+
 import { contacts, slugify } from "./contact";
+import { ThreeDotButton, PopUpMenu } from "./menus.js";
+import { ContactForm } from "./createContact.js";
 
 class App extends React.Component {
   constructor(props) {
@@ -19,6 +25,7 @@ class App extends React.Component {
   }
 
   render() {
+    //probably all this logic should be on SearchDialog component ?
     const term = this.state.searchTerm.toLowerCase().trim();
     let searchDialog;
     if (term) {
@@ -35,6 +42,7 @@ class App extends React.Component {
       <div className="contact-app">
         <SearchBar term={this.state.searchTerm} onSearch={this.handleSearch} />
         {searchDialog}
+        <ContactForm />
         <ContactsContainer contacts={this.props.contacts} />
       </div>
     );
@@ -47,13 +55,21 @@ function SearchDialog(props) {
   const contacts = props.contacts.map(contact => {
     return <Contact {...contact} key={contact.name + contact.lastName} />;
   });
-  return <div className="search-dialog">{contacts}</div>;
+  return (
+    <div className="search-dialog">
+      {" "}
+      <p className="search-message">
+        {contacts.length ? "Search results" : "No results"}
+      </p>
+      {contacts}
+    </div>
+  );
 }
 
 function sortContactsAlphabetically(contacts) {
   const result = contacts.sort((contA, contB) => {
-    const fullNameA = contA.name + contA.lastName;
-    const fullNameB = contB.name + contB.lastName;
+    const fullNameA = contA.firstName + contA.lastName;
+    const fullNameB = contB.firstName + contB.lastName;
 
     return fullNameA.localeCompare(fullNameB);
   });
@@ -105,18 +121,10 @@ function Contact(props) {
       <div className="contact-initials">
         {firstName.charAt(0) + lastName.charAt(0)}
       </div>
-      <div className="contact-name">{`${firstName} ${lastName}`}</div>
-      <ThreeDotButton />
-    </div>
-  );
-}
-
-function ThreeDotButton() {
-  return (
-    <div className="three-dot-button" tabIndex="0">
-      <div className="dot"></div>
-      <div className="dot"></div>
-      <div className="dot"></div>
+      <div className="contact-name">
+        {`${firstName} ${lastName}`}
+        <ThreeDotButton />
+      </div>
     </div>
   );
 }
