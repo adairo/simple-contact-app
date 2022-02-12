@@ -9,13 +9,25 @@ import { contacts, slugify } from "./contact";
 import { ThreeDotButton, PopUpMenu } from "./menus.js";
 import { ContactForm } from "./createContact.js";
 
+const ButtonNewContact = props => {
+  return (
+    <button
+      className={`float-button ${props.showing ? "rotated" : ""}`}
+      onClick={props.onPress}
+    >
+      <div className="cross horizontal"></div>
+      <div className="cross vertical"></div>
+    </button>
+  );
+};
+
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       searchTerm: "",
       contacts: contacts,
-      showingForm: true,
+      showingForm: false,
     };
 
     this.handleSearch = this.handleSearch.bind(this);
@@ -31,7 +43,7 @@ class App extends React.Component {
     const contacts = [...this.state.contacts];
     contacts.push({ firstName, lastName, number });
 
-    this.setState({ contacts });
+    this.setState({ contacts, showingForm: false });
   }
 
   render() {
@@ -55,7 +67,16 @@ class App extends React.Component {
         {this.state.showingForm && (
           <ContactForm onNewContact={this.createContact} />
         )}
-        <ContactsContainer contacts={this.state.contacts} />
+        <ContactsContainer
+          showingForm={this.state.showingForm}
+          contacts={this.state.contacts}
+        />
+        <ButtonNewContact
+          showing={this.state.showingForm}
+          onPress={() =>
+            this.setState({ showingForm: !this.state.showingForm })
+          }
+        />
       </div>
     );
   }
@@ -109,7 +130,11 @@ function ContactsContainer(props) {
     return <ContactGroup contacts={group} key={group[0].firstName.charAt(0)} />;
   });
 
-  return <div className="contacts-container">{groups}</div>;
+  return (
+    <div className={`contacts-container ${props.showingForm ? "opaque" : ""}`}>
+      {groups}
+    </div>
+  );
 }
 
 function ContactGroup(props) {

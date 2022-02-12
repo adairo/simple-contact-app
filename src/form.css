@@ -3,6 +3,7 @@
   position: absolute;
   flex-direction: column;
   left: 50%;
+  z-index: 5;
   transform: translateX(-50%);
   align-items: center;
   background-color: white;
