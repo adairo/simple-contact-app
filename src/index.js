@@ -14,14 +14,24 @@ class App extends React.Component {
     super(props);
     this.state = {
       searchTerm: "",
+      contacts: contacts,
+      showingForm: true,
     };
 
     this.handleSearch = this.handleSearch.bind(this);
+    this.createContact = this.createContact.bind(this);
   }
 
   handleSearch(e) {
     const term = e.target.value;
     this.setState({ searchTerm: term });
+  }
+
+  createContact(firstName, lastName, number) {
+    const contacts = [...this.state.contacts];
+    contacts.push({ firstName, lastName, number });
+
+    this.setState({ contacts });
   }
 
   render() {
@@ -30,7 +40,7 @@ class App extends React.Component {
     let searchDialog;
     if (term) {
       // contacts that matched the search query
-      const match = this.props.contacts.filter(contact => {
+      const match = this.state.contacts.filter(contact => {
         const fullNameTerm = `${contact.firstName} ${contact.lastName}`;
         if (slugify(fullNameTerm.toLowerCase()).indexOf(term) !== -1) {
           return contact;
@@ -42,8 +52,10 @@ class App extends React.Component {
       <div className="contact-app">
         <SearchBar term={this.state.searchTerm} onSearch={this.handleSearch} />
         {searchDialog}
-        <ContactForm />
-        <ContactsContainer contacts={this.props.contacts} />
+        {this.state.showingForm && (
+          <ContactForm onNewContact={this.createContact} />
+        )}
+        <ContactsContainer contacts={this.state.contacts} />
       </div>
     );
   }
@@ -148,4 +160,4 @@ function SearchBar(props) {
   );
 }
 
-ReactDom.render(<App contacts={contacts} />, document.getElementById("root"));
+ReactDom.render(<App />, document.getElementById("root"));
