@@ -28,7 +28,7 @@ export const contacts = [
   {
     firstName: "Cockroach",
     lastName: "Boy",
-    numbers: [{ home: "1234567890" }, { fax: "1234567890" }],
+    number: "232312312",
   },
   {
     firstName: "Pedro",

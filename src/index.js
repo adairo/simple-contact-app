@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import ReactDom from "react-dom";
 
 import "./styles.css";
@@ -19,6 +19,10 @@ const ButtonNewContact = props => {
       <div className="cross vertical"></div>
     </button>
   );
+};
+
+const BoxShadow = props => {
+  return <div className="shadow-box">{props.children}</div>;
 };
 
 class App extends React.Component {
@@ -65,7 +69,9 @@ class App extends React.Component {
         <SearchBar term={this.state.searchTerm} onSearch={this.handleSearch} />
         {searchDialog}
         {this.state.showingForm && (
-          <ContactForm onNewContact={this.createContact} />
+          <BoxShadow>
+            <ContactForm onNewContact={this.createContact} />
+          </BoxShadow>
         )}
         <ContactsContainer
           showingForm={this.state.showingForm}
@@ -86,7 +92,7 @@ function SearchDialog(props) {
   if (!props.contacts) return null;
 
   const contacts = props.contacts.map(contact => {
-    return <Contact {...contact} key={contact.name + contact.lastName} />;
+    return <Contact contact={contact} key={contact.name + contact.lastName} />;
   });
   return (
     <div className="search-dialog">
@@ -141,7 +147,7 @@ function ContactGroup(props) {
   const groupLetter = props.contacts[0].firstName.charAt(0);
 
   const contacts = props.contacts.map(contact => {
-    return <Contact {...contact} key={contact.name + contact.lastName} />;
+    return <Contact contact={contact} key={contact.name + contact.lastName} />;
   });
   return (
     <div className="contact-group">
@@ -152,9 +158,11 @@ function ContactGroup(props) {
 }
 
 function Contact(props) {
-  const { firstName, lastName } = props;
+  const { firstName, lastName } = props.contact;
+  const [showCS, setShowCS] = useState(false);
+
   return (
-    <div className="contact">
+    <div className="contact" onClick={() => setShowCS(true)}>
       <div className="contact-initials">
         {firstName.charAt(0) + lastName.charAt(0)}
       </div>
@@ -162,6 +170,33 @@ function Contact(props) {
         {`${firstName} ${lastName}`}
         <ThreeDotButton />
       </div>
+      {showCS && <ContactScreen contact={props.contact} />}
+    </div>
+  );
+}
+
+function ContactScreen(props) {
+  const { firstName, lastName, number } = props.contact;
+  const fullName = `${firstName} ${lastName}`;
+  return (
+    <div className="contact-screen">
+      <header className="contact-screen-name">{fullName}</header>
+      <label className="form-field">
+        First name
+        <input className="form-input" value={firstName}></input>
+      </label>
+
+      <label className="form-field">
+        Last name
+        <input className="form-input" value={lastName}></input>
+      </label>
+
+      <label className="form-field">
+        Phone number
+        <input className="form-input" value={number}></input>
+      </label>
+
+      <button className="save-button">Save</button>
     </div>
   );
 }

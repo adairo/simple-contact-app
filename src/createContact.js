@@ -3,9 +3,9 @@ import React, { useState, useEffect } from "react";
 const createContact = e => {};
 
 export function ContactForm(props) {
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [number, setNumber] = useState("");
+  const [firstName, setFirstName] = useState(props.firstName);
+  const [lastName, setLastName] = useState(props.lastName);
+  const [number, setNumber] = useState(props.number);
 
   useEffect(() => {
     const fname = document.querySelector(".form-input");
