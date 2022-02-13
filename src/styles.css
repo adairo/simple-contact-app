@@ -18,16 +18,27 @@ body {
   width: 100vw;
 }
 
-.shadow-box {
+.content-box {
+  display: flex;
+  justify-content: center;
   background-color: white;
   box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
   border-radius: 1em;
   padding: 3rem;
-  position: absolute;
   z-index: 5;
+  position: fixed;
+}
 
+.content-box.center {
+  margin: 3em;
   left: 50%;
   transform: translateX(-50%);
+}
+
+.content-box.bottom {
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
 .search-container {
@@ -191,7 +202,7 @@ body {
   right: 1em;
   bottom: 1em;
   cursor: pointer;
-  z-index: 6;
+  z-index: 4;
   background-color: rgb(0, 158, 206);
   width: 5em;
   aspect-ratio: 1;
@@ -204,9 +215,10 @@ body {
 }
 
 .float-button.rotated {
-  transform: translateY(-86vh) rotate(45deg);
+  transform: translate(0.8em, -48vh) rotate(45deg);
   background-color: rgb(255, 41, 41);
   width: 3em;
+  z-index: 5;
 }
 
 .cross {

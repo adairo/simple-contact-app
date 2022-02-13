@@ -21,8 +21,12 @@ const ButtonNewContact = props => {
   );
 };
 
-const BoxShadow = props => {
-  return <div className="shadow-box">{props.children}</div>;
+const ContentBox = props => {
+  return (
+    <div className={`content-box ${props.position} opaque`}>
+      {props.children}
+    </div>
+  );
 };
 
 class App extends React.Component {
@@ -69,9 +73,12 @@ class App extends React.Component {
         <SearchBar term={this.state.searchTerm} onSearch={this.handleSearch} />
         {searchDialog}
         {this.state.showingForm && (
-          <BoxShadow>
-            <ContactForm onNewContact={this.createContact} />
-          </BoxShadow>
+          <ContentBox position="bottom">
+            <div>
+              <p className="contact-screen-name">Create contact</p>
+              <ContactForm onNewContact={this.createContact} />
+            </div>
+          </ContentBox>
         )}
         <ContactsContainer
           showingForm={this.state.showingForm}
@@ -176,28 +183,18 @@ function Contact(props) {
 }
 
 function ContactScreen(props) {
-  const { firstName, lastName, number } = props.contact;
+  const { firstName, lastName } = props.contact;
   const fullName = `${firstName} ${lastName}`;
   return (
-    <div className="contact-screen">
-      <header className="contact-screen-name">{fullName}</header>
-      <label className="form-field">
-        First name
-        <input className="form-input" value={firstName}></input>
-      </label>
-
-      <label className="form-field">
-        Last name
-        <input className="form-input" value={lastName}></input>
-      </label>
-
-      <label className="form-field">
-        Phone number
-        <input className="form-input" value={number}></input>
-      </label>
-
-      <button className="save-button">Save</button>
-    </div>
+    <ContentBox position="bottom">
+      <div>
+        <p className="contact-screen-name">{fullName}</p>
+        <ContactForm
+          onNewContact={props.createContact}
+          contact={props.contact}
+        />
+      </div>
+    </ContentBox>
   );
 }
 
