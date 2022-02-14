@@ -105,7 +105,7 @@ function SearchDialog(props) {
   if (!props.contacts) return null;
 
   const contacts = props.contacts.map(contact => {
-    return <Contact contact={contact} key={contact.name + contact.lastName} />;
+    return <Contact contact={contact} key={contact.id} />;
   });
   return (
     <div className="search-dialog">

@@ -9,7 +9,7 @@ const accentsMap = {
 };
 
 export const slugify = text => {
-  Object.keys(accentsMap).reduce(
+  return Object.keys(accentsMap).reduce(
     (acc, cur) => acc.replace(new RegExp(accentsMap[cur], "g"), cur),
     text
   );
