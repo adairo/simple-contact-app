@@ -1,66 +1,68 @@
 import React, { useState, useEffect } from "react";
 
-const createContact = e => {};
+export class ContactForm extends React.Component {
+  constructor(props) {
+    super(props);
+    const { firstName, lastName, number } = props.contact;
+    this.state = { firstName, lastName, number };
 
-export function ContactForm(props) {
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [number, setNumber] = useState("");
+    this.handleChange = this.handleChange.bind(this);
+  }
 
-  useEffect(() => {
-    const fname = document.querySelector(".form-input");
-    fname.focus();
-  }, [firstName]);
+  handleChange(e) {
+    this.setState({
+      [e.target.name]: e.target.value,
+    });
+  }
 
-  useEffect(() => {
-    console.log(props.contact);
-    setFirstName(props.contact?.firstName);
-    setLastName(props.contact?.lastName);
-    setNumber(props.contact?.number);
-  }, []);
+  render() {
+    return (
+      <form
+        className="contact-form"
+        onSubmit={e => {
+          e.preventDefault();
+          const { firstName, lastName, number } = this.state;
+          this.props.onSubmit({ firstName, lastName, number });
+        }}
+      >
+        <label className="form-field">
+          First name
+          <input
+            type="text"
+            className="form-input"
+            name="firstName"
+            value={this.state.firstName}
+            onChange={this.handleChange}
+            placeholder="Example: John"
+          ></input>
+        </label>
 
-  return (
-    <form
-      className="contact-form"
-      onSubmit={e => {
-        e.preventDefault();
-        props.onNewContact(firstName, lastName, number);
-      }}
-    >
-      <label className="form-field">
-        First name
-        <input
-          type="text"
-          className="form-input"
-          value={firstName}
-          onChange={e => setFirstName(e.target.value)}
-          placeholder="Example: John"
-        ></input>
-      </label>
+        <label className="form-field">
+          Last name
+          <input
+            type="text"
+            className="form-input"
+            name="lastName"
+            value={this.state.lastName}
+            onChange={this.handleChange}
+            placeholder="Example: Salchichon"
+          ></input>
+        </label>
 
-      <label className="form-field">
-        Last name
-        <input
-          type="text"
-          className="form-input"
-          value={lastName}
-          onChange={e => setLastName(e.target.value)}
-          placeholder="Example: Salchichon"
-        ></input>
-      </label>
+        <label className="form-field">
+          Phone number
+          <input
+            type="text"
+            className="form-input"
+            name="number"
+            value={this.state.number}
+            onChange={this.handleChange}
+            placeholder="Example: 1234567890"
+          ></input>
+        </label>
 
-      <label className="form-field">
-        Phone number
-        <input
-          type="text"
-          value={number}
-          className="form-input"
-          onChange={e => setNumber(e.target.value)}
-          placeholder="Example: 1234567890"
-        ></input>
-      </label>
-
-      <button className="save-button">Save contact</button>
-    </form>
-  );
+        <button className="save-button">Save contact</button>
+      </form>
+    );
+  }
 }

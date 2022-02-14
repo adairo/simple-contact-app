@@ -47,9 +47,9 @@ class App extends React.Component {
     this.setState({ searchTerm: term });
   }
 
-  createContact(firstName, lastName, number) {
+  createContact(contact) {
     const contacts = [...this.state.contacts];
-    contacts.push({ firstName, lastName, number });
+    contacts.push(contact);
 
     this.setState({ contacts, showingForm: false });
   }
@@ -76,7 +76,10 @@ class App extends React.Component {
           <ContentBox position="bottom">
             <div>
               <p className="contact-screen-name">Create contact</p>
-              <ContactForm onNewContact={this.createContact} />
+              <ContactForm
+                onSubmit={this.createContact}
+                contact={{ firstName: "", lastName: "", number: "" }}
+              />
             </div>
           </ContentBox>
         )}
