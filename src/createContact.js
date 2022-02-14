@@ -15,14 +15,24 @@ export class ContactForm extends React.Component {
     });
   }
 
+  submitContact() {
+    const { firstName, lastName, number } = this.state;
+
+    this.props.onSubmit({
+      firstName,
+      lastName,
+      number,
+      id: this.props.contact.id,
+    });
+  }
+
   render() {
     return (
       <form
         className="contact-form"
         onSubmit={e => {
           e.preventDefault();
-          const { firstName, lastName, number } = this.state;
-          this.props.onSubmit({ firstName, lastName, number });
+          this.submitContact();
         }}
       >
         <label className="form-field">

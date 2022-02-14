@@ -1,18 +1,18 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ReactDom from "react-dom";
 
 import "./styles.css";
 import "./menus.css";
 import "./form.css";
 
-import { contacts, slugify } from "./contact";
+import { contacts, slugify, idGenerator } from "./contact";
 import { ThreeDotButton, PopUpMenu } from "./menus.js";
 import { ContactForm } from "./createContact.js";
 
 const ButtonNewContact = props => {
   return (
     <button
-      className={`float-button ${props.showing ? "rotated" : ""}`}
+      className={`float-button ${props.isOpen ? "open" : ""}`}
       onClick={props.onPress}
     >
       <div className="cross horizontal"></div>
@@ -40,6 +40,7 @@ class App extends React.Component {
 
     this.handleSearch = this.handleSearch.bind(this);
     this.createContact = this.createContact.bind(this);
+    this.updateContact = this.updateContact.bind(this);
   }
 
   handleSearch(e) {
@@ -52,6 +53,14 @@ class App extends React.Component {
     contacts.push(contact);
 
     this.setState({ contacts, showingForm: false });
+  }
+
+  updateContact(contact) {
+    const contacts = [...this.state.contacts];
+    let updatedContact = contacts.find(cont => contact.id === cont.id);
+    updatedContact.firstName = contact.firstName;
+    updatedContact.lastName = contact.lastName;
+    updatedContact.number = contact.number;
   }
 
   render() {
@@ -70,25 +79,19 @@ class App extends React.Component {
     }
     return (
       <div className="contact-app">
+        <div className="opaco" />
         <SearchBar term={this.state.searchTerm} onSearch={this.handleSearch} />
         {searchDialog}
         {this.state.showingForm && (
-          <ContentBox position="bottom">
-            <div>
-              <p className="contact-screen-name">Create contact</p>
-              <ContactForm
-                onSubmit={this.createContact}
-                contact={{ firstName: "", lastName: "", number: "" }}
-              />
-            </div>
-          </ContentBox>
+          <NewContactScreen onNew={this.createContact} />
         )}
         <ContactsContainer
           showingForm={this.state.showingForm}
           contacts={this.state.contacts}
+          onUpdate={this.updateContact}
         />
         <ButtonNewContact
-          showing={this.state.showingForm}
+          isOpen={this.state.showingForm}
           onPress={() =>
             this.setState({ showingForm: !this.state.showingForm })
           }
@@ -143,7 +146,13 @@ function divideOnGroups(contacts) {
 function ContactsContainer(props) {
   const sorted = sortContactsAlphabetically(props.contacts);
   const groups = divideOnGroups(sorted).map(group => {
-    return <ContactGroup contacts={group} key={group[0].firstName.charAt(0)} />;
+    return (
+      <ContactGroup
+        onUpdate={props.onUpdate}
+        contacts={group}
+        key={group[0].firstName.charAt(0)}
+      />
+    );
   });
 
   return (
@@ -157,7 +166,9 @@ function ContactGroup(props) {
   const groupLetter = props.contacts[0].firstName.charAt(0);
 
   const contacts = props.contacts.map(contact => {
-    return <Contact contact={contact} key={contact.name + contact.lastName} />;
+    return (
+      <Contact contact={contact} onUpdate={props.onUpdate} key={contact.id} />
+    );
   });
   return (
     <div className="contact-group">
@@ -171,8 +182,18 @@ function Contact(props) {
   const { firstName, lastName } = props.contact;
   const [showCS, setShowCS] = useState(false);
 
+  const handleUpdate = contact => {
+    setShowCS(false);
+    props.onUpdate(contact);
+  };
+
   return (
-    <div className="contact" onClick={() => setShowCS(true)}>
+    <div
+      className="contact"
+      onClick={() => {
+        setShowCS(true);
+      }}
+    >
       <div className="contact-initials">
         {firstName.charAt(0) + lastName.charAt(0)}
       </div>
@@ -180,22 +201,44 @@ function Contact(props) {
         {`${firstName} ${lastName}`}
         <ThreeDotButton />
       </div>
-      {showCS && <ContactScreen contact={props.contact} />}
+      {showCS && (
+        <ContactScreen contact={props.contact} updateContact={handleUpdate} />
+      )}
     </div>
   );
 }
 
+const NewContactScreen = props => {
+  return (
+    <ContentBox position="bottom">
+      <div>
+        <p className="contact-screen-name">Create contact</p>
+        <ContactForm
+          onSubmit={props.onNew}
+          contact={{ firstName: "", lastName: "", number: "" }}
+        />
+      </div>
+    </ContentBox>
+  );
+};
+
 function ContactScreen(props) {
   const { firstName, lastName } = props.contact;
   const fullName = `${firstName} ${lastName}`;
+  const opaque = document.querySelector(".opaco");
+
+  useEffect(() => {
+    opaque.classList.add("active");
+
+    return () => {
+      opaque.classList.remove("active");
+    };
+  });
   return (
     <ContentBox position="bottom">
       <div>
         <p className="contact-screen-name">{fullName}</p>
-        <ContactForm
-          onNewContact={props.createContact}
-          contact={props.contact}
-        />
+        <ContactForm onSubmit={props.updateContact} contact={props.contact} />
       </div>
     </ContentBox>
   );
@@ -204,7 +247,6 @@ function ContactScreen(props) {
 function SearchBar(props) {
   return (
     <div className="search-container">
-      {/* <label htmlFor="search-bar">Search</label> */}
       <input
         id="search-bar"
         className="search-input"
@@ -213,9 +255,6 @@ function SearchBar(props) {
         placeholder="Search contact name"
         type="text"
       />
-      {/* <button className="search-button" type="submit">
-        Search
-      </button> */}
     </div>
   );
 }
