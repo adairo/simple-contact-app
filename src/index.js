@@ -36,11 +36,27 @@ class App extends React.Component {
       searchTerm: "",
       contacts: contacts,
       showingForm: false,
+      showSearchDialog: false,
     };
 
     this.handleSearch = this.handleSearch.bind(this);
     this.createContact = this.createContact.bind(this);
     this.updateContact = this.updateContact.bind(this);
+    this.handleSearchBlur = this.handleSearchBlur.bind(this);
+    this.handleSearchFocus = this.handleSearchFocus.bind(this);
+
+    this.searchBar = React.createRef();
+  }
+
+  handleSearchBlur() {
+    console.log("setting False");
+    this.setState({ showSearchDialog: false });
+  }
+
+  handleSearchFocus() {
+    console.log("setting true");
+
+    this.setState({ showSearchDialog: true });
   }
 
   handleSearch(e) {
@@ -75,21 +91,32 @@ class App extends React.Component {
           return contact;
         }
       });
-      searchDialog = <SearchDialog contacts={match}></SearchDialog>;
+      searchDialog = (
+        <SearchDialog contacts={match} show={this.state.showSearchDialog} />
+      );
     }
     return (
       <div className="contact-app">
         <div className="opaco" />
-        <SearchBar term={this.state.searchTerm} onSearch={this.handleSearch} />
+
+        <SearchBar
+          term={this.state.searchTerm}
+          onSearch={this.handleSearch}
+          onBlur={this.handleSearchBlur}
+          onFocus={this.handleSearchFocus}
+        />
         {searchDialog}
+
         {this.state.showingForm && (
           <NewContactScreen onNew={this.createContact} />
         )}
+
         <ContactsContainer
           showingForm={this.state.showingForm}
           contacts={this.state.contacts}
           onUpdate={this.updateContact}
         />
+
         <ButtonNewContact
           isOpen={this.state.showingForm}
           onPress={() =>
@@ -102,14 +129,13 @@ class App extends React.Component {
 }
 
 function SearchDialog(props) {
-  if (!props.contacts) return null;
+  if (!props.contacts || !props.show) return null;
 
   const contacts = props.contacts.map(contact => {
     return <Contact contact={contact} key={contact.id} />;
   });
   return (
     <div className="search-dialog">
-      {" "}
       <p className="search-message">
         {contacts.length ? "Search results" : "No results"}
       </p>
@@ -244,19 +270,22 @@ function ContactScreen(props) {
   );
 }
 
-function SearchBar(props) {
+const SearchBar = React.forwardRef((props, ref) => {
   return (
     <div className="search-container">
       <input
-        id="search-bar"
         className="search-input"
-        value={props.term}
-        onChange={props.onSearch}
-        placeholder="Search contact name"
         type="text"
+        id="search-bar"
+        ref={ref}
+        value={props.term}
+        placeholder="Search contact name"
+        onChange={props.onSearch}
+        onBlur={props.onBlur}
+        onFocus={props.onFocus}
       />
     </div>
   );
-}
+});
 
 ReactDom.render(<App />, document.getElementById("root"));
