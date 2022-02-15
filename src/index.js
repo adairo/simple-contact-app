@@ -23,9 +23,10 @@ const ButtonNewContact = props => {
 
 const ContentBox = props => {
   return (
-    <div className={`content-box ${props.position} opaque`}>
-      {props.children}
-    </div>
+    <>
+      <div className="dark-wall" />
+      <div className={`content-box ${props.position}`}>{props.children}</div>
+    </>
   );
 };
 
@@ -181,11 +182,7 @@ function ContactsContainer(props) {
     );
   });
 
-  return (
-    <div className={`contacts-container ${props.showingForm ? "opaque" : ""}`}>
-      {groups}
-    </div>
-  );
+  return <div className={`contacts-container`}>{groups}</div>;
 }
 
 function ContactGroup(props) {
@@ -253,13 +250,13 @@ function ContactScreen(props) {
   const fullName = `${firstName} ${lastName}`;
   const opaque = document.querySelector(".opaco");
 
-  useEffect(() => {
-    opaque.classList.add("active");
+  // useEffect(() => {
+  //   opaque.classList.add("active");
 
-    return () => {
-      opaque.classList.remove("active");
-    };
-  });
+  //   return () => {
+  //     opaque.classList.remove("active");
+  //   };
+  // });
   return (
     <ContentBox position="bottom">
       <div>
