@@ -36,8 +36,9 @@ class App extends React.Component {
     this.state = {
       searchTerm: "",
       contacts: contacts,
-      showingForm: false,
+      showNewContact: false,
       showSearchDialog: false,
+      contactShowed: null,
     };
 
     this.handleSearch = this.handleSearch.bind(this);
@@ -45,18 +46,16 @@ class App extends React.Component {
     this.updateContact = this.updateContact.bind(this);
     this.handleSearchBlur = this.handleSearchBlur.bind(this);
     this.handleSearchFocus = this.handleSearchFocus.bind(this);
+    this.showContact = this.showContact.bind(this);
 
     this.searchBar = React.createRef();
   }
 
   handleSearchBlur() {
-    console.log("setting False");
     this.setState({ showSearchDialog: false });
   }
 
   handleSearchFocus() {
-    console.log("setting true");
-
     this.setState({ showSearchDialog: true });
   }
 
@@ -66,10 +65,17 @@ class App extends React.Component {
   }
 
   createContact(contact) {
-    const contacts = [...this.state.contacts];
-    contacts.push(contact);
+    this.setState({
+      contacts: this.state.contacts.concat(contact),
+      showNewContact: false,
+    });
+  }
 
-    this.setState({ contacts, showingForm: false });
+  showContact(contact) {
+    this.setState({
+      showContact: true,
+      contactShowed: contact,
+    });
   }
 
   updateContact(contact) {
@@ -98,8 +104,6 @@ class App extends React.Component {
     }
     return (
       <div className="contact-app">
-        <div className="opaco" />
-
         <SearchBar
           term={this.state.searchTerm}
           onSearch={this.handleSearch}
@@ -108,20 +112,27 @@ class App extends React.Component {
         />
         {searchDialog}
 
-        {this.state.showingForm && (
+        {this.state.showNewContact && (
           <NewContactScreen onNew={this.createContact} />
         )}
 
+        {this.state.showContact && (
+          <ContactScreen
+            contact={this.state.contactShowed}
+            updateContact={"handleUpdate"}
+          />
+        )}
+
         <ContactsContainer
-          showingForm={this.state.showingForm}
           contacts={this.state.contacts}
           onUpdate={this.updateContact}
+          onShow={this.showContact}
         />
 
         <ButtonNewContact
-          isOpen={this.state.showingForm}
+          isOpen={this.state.showNewContact | this.state.showContact}
           onPress={() =>
-            this.setState({ showingForm: !this.state.showingForm })
+            this.setState({ showNewContact: false, showContact: false })
           }
         />
       </div>
@@ -178,6 +189,7 @@ function ContactsContainer(props) {
         onUpdate={props.onUpdate}
         contacts={group}
         key={group[0].firstName.charAt(0)}
+        onShow={props.onShow}
       />
     );
   });
@@ -190,7 +202,12 @@ function ContactGroup(props) {
 
   const contacts = props.contacts.map(contact => {
     return (
-      <Contact contact={contact} onUpdate={props.onUpdate} key={contact.id} />
+      <Contact
+        contact={contact}
+        onUpdate={props.onUpdate}
+        key={contact.id}
+        onShow={props.onShow}
+      />
     );
   });
   return (
@@ -203,20 +220,10 @@ function ContactGroup(props) {
 
 function Contact(props) {
   const { firstName, lastName } = props.contact;
-  const [showCS, setShowCS] = useState(false);
-
-  const handleUpdate = contact => {
-    setShowCS(false);
-    props.onUpdate(contact);
-  };
+  console.log(props);
 
   return (
-    <div
-      className="contact"
-      onClick={() => {
-        setShowCS(true);
-      }}
-    >
+    <div className="contact" onClick={() => props.onShow(props.contact)}>
       <div className="contact-initials">
         {firstName.charAt(0) + lastName.charAt(0)}
       </div>
@@ -224,9 +231,6 @@ function Contact(props) {
         {`${firstName} ${lastName}`}
         <ThreeDotButton />
       </div>
-      {showCS && (
-        <ContactScreen contact={props.contact} updateContact={handleUpdate} />
-      )}
     </div>
   );
 }
