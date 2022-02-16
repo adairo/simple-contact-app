@@ -131,8 +131,14 @@ class App extends React.Component {
 
         <ButtonNewContact
           isOpen={this.state.showNewContact | this.state.showContact}
-          onPress={() =>
-            this.setState({ showNewContact: false, showContact: false })
+          onPress={
+            () =>
+              this.setState(state => {
+                if (state.showNewContact || state.showContact)
+                  return { showNewContact: false, showContact: false };
+                return { showNewContact: true };
+              })
+            // this.setState({ showNewContact: false, showContact: false })
           }
         />
       </div>
