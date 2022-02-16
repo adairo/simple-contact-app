@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import ReactDom from "react-dom";
 
 import "./styles.css";
@@ -22,10 +22,26 @@ const ButtonNewContact = props => {
 };
 
 const ContentBox = props => {
+  const contentBox = useRef();
+
+  useEffect(() => {
+    const button = document.querySelector(".float-button");
+    const width = button.getClientRects()[0].width;
+    console.log(width);
+    const position = contentBox.current.clientHeight;
+    button.style.bottom = position - 22.28 + "px";
+
+    return () => {
+      button.style.bottom = "1rem";
+    };
+  });
+
   return (
     <>
       <div className="dark-wall" />
-      <div className={`content-box ${props.position}`}>{props.children}</div>
+      <div className={`content-box ${props.position}`} ref={contentBox}>
+        {props.children}
+      </div>
     </>
   );
 };
@@ -226,7 +242,6 @@ function ContactGroup(props) {
 
 function Contact(props) {
   const { firstName, lastName } = props.contact;
-  console.log(props);
 
   return (
     <div className="contact" onClick={() => props.onShow(props.contact)}>
