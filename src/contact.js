@@ -16,7 +16,7 @@ export const slugify = text => {
 };
 
 function* genId() {
-  let id = 10;
+  let id = 0;
   while (true) {
     yield ++id;
   }

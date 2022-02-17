@@ -26,8 +26,6 @@ const ContentBox = props => {
 
   useEffect(() => {
     const button = document.querySelector(".float-button");
-    const width = button.getClientRects()[0].width;
-    console.log(width);
     const position = contentBox.current.clientHeight;
     button.style.bottom = position - 22.28 + "px";
 
@@ -53,6 +51,7 @@ class App extends React.Component {
       searchTerm: "",
       contacts: contacts,
       showNewContact: false,
+      showContact: false,
       showSearchDialog: false,
       contactShowed: null,
     };
@@ -60,14 +59,15 @@ class App extends React.Component {
     this.handleSearch = this.handleSearch.bind(this);
     this.createContact = this.createContact.bind(this);
     this.updateContact = this.updateContact.bind(this);
-    this.handleSearchBlur = this.handleSearchBlur.bind(this);
     this.handleSearchFocus = this.handleSearchFocus.bind(this);
     this.showContact = this.showContact.bind(this);
+    this.closeSearch = this.closeSearch.bind(this)
 
     this.searchBar = React.createRef();
   }
 
-  handleSearchBlur() {
+  closeSearch(e) {
+
     this.setState({ showSearchDialog: false });
   }
 
@@ -81,6 +81,7 @@ class App extends React.Component {
   }
 
   createContact(contact) {
+    contact.id = idGenerator.next().value + 10
     this.setState({
       contacts: this.state.contacts.concat(contact),
       showNewContact: false,
@@ -100,6 +101,8 @@ class App extends React.Component {
     updatedContact.firstName = contact.firstName;
     updatedContact.lastName = contact.lastName;
     updatedContact.number = contact.number;
+
+    this.setState({showContact: false})
   }
 
   render() {
@@ -115,7 +118,7 @@ class App extends React.Component {
         }
       });
       searchDialog = (
-        <SearchDialog contacts={match} show={this.state.showSearchDialog} />
+        <SearchDialog onShow={this.showContact} contacts={match} show={this.state.showSearchDialog} closeSearch={this.closeSearch} />
       );
     }
     return (
@@ -125,8 +128,9 @@ class App extends React.Component {
           onSearch={this.handleSearch}
           onBlur={this.handleSearchBlur}
           onFocus={this.handleSearchFocus}
-        />
-        {searchDialog}
+        >
+        {this.state.showSearchDialog && searchDialog}
+        </SearchBar>
 
         {this.state.showNewContact && (
           <NewContactScreen onNew={this.createContact} />
@@ -135,7 +139,7 @@ class App extends React.Component {
         {this.state.showContact && (
           <ContactScreen
             contact={this.state.contactShowed}
-            updateContact={"handleUpdate"}
+            onUpdate={this.updateContact}
           />
         )}
 
@@ -163,10 +167,24 @@ class App extends React.Component {
 }
 
 function SearchDialog(props) {
-  if (!props.contacts || !props.show) return null;
+  useEffect(() => {
+
+    function handler(e) {
+      if (!e.target.matches('.search-container *'))
+        props.closeSearch()
+    }
+
+    document.addEventListener('click', handler)
+
+    return function() {
+      document.removeEventListener('click', handler)
+    }
+  }, [])
+
+
 
   const contacts = props.contacts.map(contact => {
-    return <Contact contact={contact} key={contact.id} />;
+    return <Contact onShow={props.onShow} contact={contact} key={contact.id} />;
   });
   return (
     <div className="search-dialog">
@@ -190,12 +208,12 @@ function sortContactsAlphabetically(contacts) {
 }
 
 function divideOnGroups(contacts) {
-  const charSet = new Set(contacts.map(contact => contact.firstName.charAt(0)));
+  const charSet = new Set(contacts.map(contact => contact.firstName.charAt(0).toUpperCase() ));
   const groups = [];
   charSet.forEach(char => {
     groups.push(
       contacts.filter(contact => {
-        if (contact.firstName.charAt(0) === char) return contact;
+        if (contact.firstName.charAt(0).toUpperCase() === char) return contact;
       })
     );
   });
@@ -220,7 +238,7 @@ function ContactsContainer(props) {
 }
 
 function ContactGroup(props) {
-  const groupLetter = props.contacts[0].firstName.charAt(0);
+  const groupLetter = props.contacts[0].firstName.charAt(0).toUpperCase();
 
   const contacts = props.contacts.map(contact => {
     return (
@@ -246,7 +264,7 @@ function Contact(props) {
   return (
     <div className="contact" onClick={() => props.onShow(props.contact)}>
       <div className="contact-initials">
-        {firstName.charAt(0) + lastName.charAt(0)}
+        {props.contact.firstName.charAt(0) + lastName.charAt(0) || ""}
       </div>
       <div className="contact-name">
         {`${firstName} ${lastName}`}
@@ -273,41 +291,33 @@ const NewContactScreen = props => {
 function ContactScreen(props) {
   const { firstName, lastName } = props.contact;
   const fullName = `${firstName} ${lastName}`;
-  const opaque = document.querySelector(".opaco");
 
-  // useEffect(() => {
-  //   opaque.classList.add("active");
-
-  //   return () => {
-  //     opaque.classList.remove("active");
-  //   };
-  // });
   return (
     <ContentBox position="bottom">
       <div>
         <p className="contact-screen-name">{fullName}</p>
-        <ContactForm onSubmit={props.updateContact} contact={props.contact} />
+        <ContactForm onSubmit={props.onUpdate} contact={props.contact} />
       </div>
     </ContentBox>
   );
 }
 
-const SearchBar = React.forwardRef((props, ref) => {
+const SearchBar = (props, ref) => {
   return (
     <div className="search-container">
       <input
         className="search-input"
         type="text"
         id="search-bar"
-        ref={ref}
         value={props.term}
         placeholder="Search contact name"
         onChange={props.onSearch}
         onBlur={props.onBlur}
         onFocus={props.onFocus}
       />
+      {props.children}
     </div>
   );
-});
+}
 
 ReactDom.render(<App />, document.getElementById("root"));

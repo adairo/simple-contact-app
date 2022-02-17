@@ -67,6 +67,8 @@ body {
 }
 
 .search-container {
+  position: relative;
+
   display: flex;
   justify-content: center;
   align-items: center;
@@ -96,17 +98,17 @@ body {
 }
 
 .search-dialog {
-  position: relative;
-  top: -0.9rem;
+  position: absolute;
+  top: 4.1rem;
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
 
   font-size: 1.6rem;
-  width: 85%;
+  width: 90%;
   margin: 0 auto;
   padding: 0.6rem;
-  border-radius: 2em;
+  border-radius: 1.2em;
   box-shadow: 1px 2px 4px 1px rgba(0, 0, 0, 0.3);
   background-color: rgb(255, 255, 255);
 }
