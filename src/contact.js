@@ -26,51 +26,15 @@ export const idGenerator = genId();
 
 export const contacts = [
   {
-    firstName: "Isidro",
-    lastName: "Manzanillotla",
-    number: "1234567890",
+    firstName: 'Linus',
+    lastName: 'Torvaldo',
+    number: "9887653212",
+    id: 2
+  },
+  { 
+    firstName: "Billy",
+    lastName: "Joel",
+    number: "7767654321",
     id: 1,
-  },
-  {
-    firstName: "Mike",
-    lastName: "Wazowsky",
-    number: "1234567890",
-    id: 2,
-  },
-  {
-    firstName: "Cockroach",
-    lastName: "Boy",
-    number: "232312312",
-    id: 3,
-  },
-  {
-    firstName: "Pedro",
-    lastName: "Parques",
-    number: "1234567890",
-    id: 4,
-  },
-  {
-    firstName: "Perrito",
-    lastName: "Loquito",
-    number: "1234567890",
-    id: 5,
-  },
-  {
-    firstName: "Canela",
-    lastName: "López",
-    number: "1234567890",
-    id: 6,
-  },
-  {
-    firstName: "Ana",
-    lastName: "Linda",
-    number: "1234567890",
-    id: 7,
-  },
-  {
-    firstName: "Carrera",
-    lastName: "Trunca",
-    number: "1234567890",
-    id: 8,
-  },
+  }
 ];

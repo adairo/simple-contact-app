@@ -4,7 +4,7 @@ export class ContactForm extends React.Component {
   constructor(props) {
     super(props);
     const { firstName, lastName, number } = props.contact;
-    this.state = { firstName, lastName, number };
+    this.state = { firstName, lastName, number, emptyFirst: false };
 
     this.handleChange = this.handleChange.bind(this);
   }
@@ -17,7 +17,13 @@ export class ContactForm extends React.Component {
 
   submitContact() {
     const { firstName, lastName, number } = this.state;
-
+    if (firstName === "") {
+      this.setState({ emptyFirst: true });
+      setTimeout(() => {
+        this.setState({emptyFirst: false})
+      }, 2200)
+      return;
+    }
     this.props.onSubmit({
       firstName,
       lastName,
@@ -39,13 +45,16 @@ export class ContactForm extends React.Component {
           First name
           <input
             type="text"
-            className="form-input"
+            className={`form-input ${this.state.emptyFirst ? "error": ""}`}
             name="firstName"
-            value={this.state.firstName}
+            value={this.state.emptyFirst ? "Please enter a valid first name": this.state.firstName}
             onChange={this.handleChange}
             placeholder="Example: John"
           ></input>
         </label>
+        {/* {this.state.emptyFirst && (
+          <p className="form-warning">Please enter a valid firstname</p>
+        )} */}
 
         <label className="form-field">
           Last name
@@ -71,7 +80,7 @@ export class ContactForm extends React.Component {
           ></input>
         </label>
 
-        <button className="save-button">Save contact</button>
+        <button className="button-form save">Save contact</button>
       </form>
     );
   }

@@ -24,11 +24,24 @@
   border: none;
 }
 
-.save-button {
-  font-size: 1.6rem;
+.form-input.error {
+  color: red;
+}
+
+.button-form {
+  font-size: 1.7rem;
   width: calc(100%);
   height: 3em;
   border-radius: 0.8em;
   border: none;
-  background-color: rgb(177, 237, 251);
+  margin-bottom: 0.4em;
+  cursor: pointer;
+}
+
+.button-form.save {
+  background-color: rgb(138, 234, 255);
+}
+
+.button-form.delete {
+  background-color: lightcoral;
 }

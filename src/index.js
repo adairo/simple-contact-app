@@ -58,16 +58,16 @@ class App extends React.Component {
 
     this.handleSearch = this.handleSearch.bind(this);
     this.createContact = this.createContact.bind(this);
+    this.deleteContact = this.deleteContact.bind(this);
     this.updateContact = this.updateContact.bind(this);
     this.handleSearchFocus = this.handleSearchFocus.bind(this);
     this.showContact = this.showContact.bind(this);
-    this.closeSearch = this.closeSearch.bind(this)
+    this.closeSearch = this.closeSearch.bind(this);
 
     this.searchBar = React.createRef();
   }
 
   closeSearch(e) {
-
     this.setState({ showSearchDialog: false });
   }
 
@@ -81,11 +81,23 @@ class App extends React.Component {
   }
 
   createContact(contact) {
-    contact.id = idGenerator.next().value + 10
+    contact.id = idGenerator.next().value + 10;
     this.setState({
       contacts: this.state.contacts.concat(contact),
       showNewContact: false,
     });
+  }
+
+  deleteContact(contact) {
+    const contacts = [...this.state.contacts];
+    const index = contacts.findIndex(cont => {
+      return cont.id === contact.id;
+    });
+    console.log(index);
+    contacts.splice(index, 1);
+    if (index !== -1) {
+      this.setState({ contacts, showContact: false, contactShowed: null });
+    }
   }
 
   showContact(contact) {
@@ -102,7 +114,7 @@ class App extends React.Component {
     updatedContact.lastName = contact.lastName;
     updatedContact.number = contact.number;
 
-    this.setState({showContact: false})
+    this.setState({ showContact: false });
   }
 
   render() {
@@ -118,7 +130,12 @@ class App extends React.Component {
         }
       });
       searchDialog = (
-        <SearchDialog onShow={this.showContact} contacts={match} show={this.state.showSearchDialog} closeSearch={this.closeSearch} />
+        <SearchDialog
+          onShow={this.showContact}
+          contacts={match}
+          show={this.state.showSearchDialog}
+          closeSearch={this.closeSearch}
+        />
       );
     }
     return (
@@ -129,7 +146,7 @@ class App extends React.Component {
           onBlur={this.handleSearchBlur}
           onFocus={this.handleSearchFocus}
         >
-        {this.state.showSearchDialog && searchDialog}
+          {this.state.showSearchDialog && searchDialog}
         </SearchBar>
 
         {this.state.showNewContact && (
@@ -140,8 +157,10 @@ class App extends React.Component {
           <ContactScreen
             contact={this.state.contactShowed}
             onUpdate={this.updateContact}
+            onDelete={this.deleteContact}
           />
         )}
+        
 
         <ContactsContainer
           contacts={this.state.contacts}
@@ -158,7 +177,6 @@ class App extends React.Component {
                   return { showNewContact: false, showContact: false };
                 return { showNewContact: true };
               })
-            // this.setState({ showNewContact: false, showContact: false })
           }
         />
       </div>
@@ -168,20 +186,16 @@ class App extends React.Component {
 
 function SearchDialog(props) {
   useEffect(() => {
-
     function handler(e) {
-      if (!e.target.matches('.search-container *'))
-        props.closeSearch()
+      if (!e.target.matches(".search-container *")) props.closeSearch();
     }
 
-    document.addEventListener('click', handler)
+    document.addEventListener("click", handler);
 
-    return function() {
-      document.removeEventListener('click', handler)
-    }
-  }, [])
-
-
+    return function () {
+      document.removeEventListener("click", handler);
+    };
+  }, []);
 
   const contacts = props.contacts.map(contact => {
     return <Contact onShow={props.onShow} contact={contact} key={contact.id} />;
@@ -208,7 +222,9 @@ function sortContactsAlphabetically(contacts) {
 }
 
 function divideOnGroups(contacts) {
-  const charSet = new Set(contacts.map(contact => contact.firstName.charAt(0).toUpperCase() ));
+  const charSet = new Set(
+    contacts.map(contact => contact.firstName.charAt(0).toUpperCase())
+  );
   const groups = [];
   charSet.forEach(char => {
     groups.push(
@@ -222,6 +238,9 @@ function divideOnGroups(contacts) {
 }
 
 function ContactsContainer(props) {
+  if (props.contacts.length === 0) {
+    return(<p className="contacts-empty">There is not any contact saved.<br/> Press the + button to save a new contact</p>)
+  }
   const sorted = sortContactsAlphabetically(props.contacts);
   const groups = divideOnGroups(sorted).map(group => {
     return (
@@ -268,13 +287,14 @@ function Contact(props) {
       </div>
       <div className="contact-name">
         {`${firstName} ${lastName}`}
-        <ThreeDotButton />
+        {/* <ThreeDotButton /> */}
       </div>
     </div>
   );
 }
 
 const NewContactScreen = props => {
+  
   return (
     <ContentBox position="bottom">
       <div>
@@ -297,6 +317,12 @@ function ContactScreen(props) {
       <div>
         <p className="contact-screen-name">{fullName}</p>
         <ContactForm onSubmit={props.onUpdate} contact={props.contact} />
+        <button
+          className="button-form delete"
+          onClick={() => props.onDelete(props.contact)}
+        >
+          Delete contact
+        </button>
       </div>
     </ContentBox>
   );
@@ -318,6 +344,6 @@ const SearchBar = (props, ref) => {
       {props.children}
     </div>
   );
-}
+};
 
 ReactDom.render(<App />, document.getElementById("root"));
