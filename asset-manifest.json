@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/simple-contact-app/static/css/main.dd40c97d.css",
+    "main.js": "/simple-contact-app/static/js/main.086a65e0.js",
+    "index.html": "/simple-contact-app/index.html",
+    "main.dd40c97d.css.map": "/simple-contact-app/static/css/main.dd40c97d.css.map",
+    "main.086a65e0.js.map": "/simple-contact-app/static/js/main.086a65e0.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.dd40c97d.css",
+    "static/js/main.086a65e0.js"
+  ]
+}
